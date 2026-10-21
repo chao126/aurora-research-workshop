@@ -14,14 +14,27 @@
 8. Compose 必须先批准 Argument，再生成 Quick / Full，Full 附 Claim Audit 和 Contested Claim 检查。
 9. Zotero 仅作为精选输入与输出，候选来源不会被自动写入。
 
-## 本地运行
+## 在任意电脑上开始维护
+
+前置条件：Git、Node.js 24.22.0 LTS（仓库内的 `.nvmrc` / `.node-version` 会帮助版本管理器自动选择）以及 npm 10 或更高版本。
 
 ```bash
-npm install
+git clone https://github.com/chao126/aurora-research-workshop.git
+cd aurora-research-workshop
+nvm install
+nvm use
+npm ci
+npm run check
 npm run dev
 ```
 
-默认预览地址为 `http://localhost:3000/`。生产构建：
+Windows 可使用支持 `.node-version` 的 fnm 或 mise 安装相同 Node 版本。默认预览地址为 `http://localhost:3000/`。
+
+日常修改应从新分支开始，提交前执行 `npm run check`，再通过 Pull Request 合并至 `main`。GitHub Actions 会在每次推送和 Pull Request 中重复执行相同检查。
+
+完整的环境变量、发布、回滚和故障排查流程见 [`docs/OPERATIONS.md`](docs/OPERATIONS.md)。
+
+生产构建：
 
 ```bash
 npm run build

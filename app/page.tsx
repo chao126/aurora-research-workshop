@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import type {
   AppView,
-  CandidateStatus,
   ResearchSource,
   SessionMode,
   SourceRole,
@@ -52,7 +51,11 @@ export default function Home() {
   useEffect(() => {
     try {
       const saved = window.localStorage.getItem('research-workspace-demo');
-      if (saved) setWorkspace(JSON.parse(saved) as WorkspaceState);
+      if (saved) {
+        // Browser persistence is restored only after hydration to keep the server render stable.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setWorkspace(JSON.parse(saved) as WorkspaceState);
+      }
     } catch {
       // A fresh demo state is safer than blocking the workspace on corrupt local data.
     }
@@ -114,7 +117,7 @@ export default function Home() {
           goDashboard={() => setView('dashboard')}
         />
       )}
-      {view === 'profile' && <ResearchProfile state={workspace} setState={setWorkspace} showToast={showToast} />}
+      {view === 'profile' && <ResearchProfile setState={setWorkspace} showToast={showToast} />}
       {view === 'integrations' && <Integrations state={workspace} setState={setWorkspace} showToast={showToast} />}
       {view === 'guide' && <GuidePage startSession={(mode) => { setGuideStartMode(mode); setView('new-session'); }} openWorkspace={openWorkspace} />}
 
@@ -670,7 +673,7 @@ function GuidePage({ startSession, openWorkspace }: { startSession: (mode: Sessi
   );
 }
 
-function ResearchProfile({ state, setState, showToast }: { state: WorkspaceState; setState: React.Dispatch<React.SetStateAction<WorkspaceState>>; showToast: (message: string) => void }) {
+function ResearchProfile({ setState, showToast }: { setState: React.Dispatch<React.SetStateAction<WorkspaceState>>; showToast: (message: string) => void }) {
   const [promoted, setPromoted] = useState(false);
   return <section className="standalone-page"><header className="page-intro"><p className="hero-kicker">LONG-TERM USER-CONTROLLED MEMORY</p><h1>Research Profile</h1><p>长期研究方向与临时会话明确分层；AI 只能建议，不能自动升级方向。</p></header><div className="profile-layout"><section className="profile-tree"><div className="panel-heading"><span>RESEARCH TRACKS</span><small>User confirmed</small></div><div className="main-track"><span>MAIN DIRECTION</span><h2>AI Governance</h2><p>研究算法系统如何被规则、组织与公共价值塑造。</p><div className="subtracks"><article><i /> <span><b>Algorithmic Accountability</b><small>12 sessions · active</small></span></article><article><i /> <span><b>AI Regulation</b><small>7 sessions · active</small></span></article><article><i /> <span><b>Public-sector AI</b><small>4 sessions · active</small></span></article></div></div><div className={`temporary-track ${promoted ? 'promoted' : ''}`}><div><span>{promoted ? 'SUBTRACK' : 'TEMPORARY'}</span><h3>AI in universities</h3><p>2 sessions · 尚未证明是长期方向</p></div><div>{!promoted && <button className="outline-button" onClick={() => { setPromoted(true); showToast('已由你确认为 Subtrack，该变更已记录在 Audit Events'); }}>Promote to Subtrack</button>}<button onClick={() => showToast('临时方向已保留，未升级')}>Keep temporary</button></div></div></section><aside className="profile-facets"><div className="panel-heading"><span>RESEARCH FACETS</span><button>Edit</button></div>{[['Theories', ['Historical institutionalism', 'Policy feedback', 'Sociotechnical systems']], ['Concepts', ['Accountability', 'Institutional drift', 'Public value']], ['Methods', ['Comparative historical', 'Process tracing', 'Policy text analysis']], ['Cases / regions', ['East Asia', 'European Union', 'Public sector']]].map(([label, items]) => <div className="facet" key={String(label)}><span>{label as string}</span><p>{(items as string[]).map((item) => <b key={item}>{item}</b>)}</p></div>)}</aside></div><section className="preference-summary"><div><p className="hero-kicker">WHAT I CURRENTLY PRIORITIZE FOR YOU</p><h2>可解释的偏好摘要</h2><p>来自显式评分与行为记录，不是黑箱推荐模型。</p></div><div className="preference-columns"><div><span>Increasing</span><p>↑ 政治制度</p><p>↑ 比较研究</p><p>↑ 东亚案例</p></div><div><span>Lower</span><p>↓ 纯描述研究</p><p>↓ 缺少方法信息</p></div><div className="preference-actions"><button className="outline-button" onClick={() => showToast('偏好现在可以被你逐项编辑')}>Edit</button><button onClick={() => { setState((value) => ({ ...value })); showToast('已准备重置；演示中未删除原始行为记录'); }}>Reset</button></div></div></section></section>;
 }

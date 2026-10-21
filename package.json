@@ -1,15 +1,17 @@
 {
-  "name": "sites-project",
+  "name": "aurora-research-workshop",
   "version": "0.1.0",
   "private": true,
   "engines": {
-    "node": ">=22.13.0"
+    "node": ">=22.13.0 <27",
+    "npm": ">=10"
   },
   "scripts": {
     "dev": "vinext dev",
     "build": "vinext build",
     "start": "vinext start",
-    "lint": "eslint . --ignore-pattern dist --ignore-pattern .next"
+    "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
+    "check": "npm run lint && npm run build"
   },
   "dependencies": {
     "next": "16.2.6",
